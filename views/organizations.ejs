@@ -3,9 +3,18 @@
         <h1>
             <%= title %>
         </h1>
-        <p>Partner Organizations</p>
-
-        <img src="/images/org-image.png" alt="Organization Example Image" class="org-image">
-
+        <% organizations.forEach(org=> { %>
+            <div class="org-card">
+                <h2>
+                    <%= org.name %>
+                </h2>
+                <p>
+                    <%= org.description %>
+                </p>
+                <p>Contact: <%= org.contact_email %>
+                </p>
+                <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo" class="org-image">
+            </div>
+            <% }) %>
     </main>
     <%- include('partials/footer') %>

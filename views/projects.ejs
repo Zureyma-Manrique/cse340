@@ -3,6 +3,16 @@
         <h1>
             <%= title %>
         </h1>
-        <p>Explore our current ongoing service projects here.</p>
+        <div class="category-list">
+            <ul>
+                <% projects.forEach(project=> { %>
+                    <li>
+                        <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
+                            day: 'numeric' }) %>:
+                            <%= project.title %> (<%= project.organization_name %>)
+                    </li>
+                    <% }) %>
+            </ul>
+        </div>
     </main>
     <%- include('partials/footer') %>

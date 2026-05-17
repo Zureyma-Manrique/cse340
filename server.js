@@ -2,48 +2,53 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { testConnection } from './src/models/db.js';
+import { getAllOrganizations } from './src/models/organizations.js';
+import { getAllProjects } from './src/models/projects.js';
+import { getAllCategories } from './src/models/categories.js';
 
-// Initialize environment variables
 dotenv.config();
 
 const app = express();
 
-// ESM specific workaround to get __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static middleware (Serves your CSS and Images)
 app.use(express.static('public'));
 
-// Routes
 app.get('/', async (req, res) => {
-    const pageTitle = 'Home';
-    res.render('index', { title: pageTitle });
+    const title = 'Home';
+    res.render('index', { title });
 });
 
 app.get('/organizations', async (req, res) => {
-    const pageTitle = 'Organizations';
-    res.render('organizations', { title: pageTitle });
+    const organizations = await getAllOrganizations();
+    const title = 'Our Partner Organizations';
+    res.render('organizations', { title, organizations });
 });
 
 app.get('/projects', async (req, res) => {
-    const pageTitle = 'Service Projects';
-    res.render('projects', { title: pageTitle });
+    const projects = await getAllProjects();
+    const title = 'Service Projects';
+    res.render('projects', { title, projects });
 });
 
-// The NEW Categories Route
 app.get('/categories', async (req, res) => {
-    const pageTitle = 'Service Project Categories';
-    res.render('categories', { title: pageTitle });
+    const categories = await getAllCategories();
+    const title = 'Service Project Categories';
+    res.render('categories', { title, categories });
 });
 
-// Server initialization
 const serverPort = process.env.PORT || 3000;
 
-app.listen(serverPort, () => {
-    console.log(`Server is running on http://localhost:${serverPort}`);
+app.listen(serverPort, async () => {
+    try {
+        await testConnection();
+        console.log(`Server is running on http://localhost:${serverPort}`);
+    } catch (error) {
+        console.error('Error connecting to the database:', error);
+    }
 });
