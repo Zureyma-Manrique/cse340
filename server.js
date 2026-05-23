@@ -3,9 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { testConnection } from './src/models/db.js';
-import { getAllOrganizations } from './src/models/organizations.js';
-import { getAllProjects } from './src/models/projects.js';
-import { getAllCategories } from './src/models/categories.js';
+import router from './src/routes.js'; // Import your unified router matrix
 
 dotenv.config();
 
@@ -19,27 +17,26 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static('public'));
 
-app.get('/', async (req, res) => {
-    const title = 'Home';
-    res.render('index', { title });
+// Global request logger middleware (Learning Activity requirement)
+app.use((req, res, next) => {
+    console.log(`${req.method} request received for: ${req.url}`);
+    next();
 });
 
-app.get('/organizations', async (req, res) => {
-    const organizations = await getAllOrganizations();
-    const title = 'Our Partner Organizations';
-    res.render('organizations', { title, organizations });
+// Direct Express to route matching pathways via your clean router module
+app.use(router);
+
+// Centralized Catch-All Error Handlers (Learning Activity placeholder structure)
+app.use((req, res, next) => {
+    const err = new Error('Page Not Found');
+    err.status = 404;
+    next(err);
 });
 
-app.get('/projects', async (req, res) => {
-    const projects = await getAllProjects();
-    const title = 'Service Projects';
-    res.render('projects', { title, projects });
-});
-
-app.get('/categories', async (req, res) => {
-    const categories = await getAllCategories();
-    const title = 'Service Project Categories';
-    res.render('categories', { title, categories });
+app.use((err, req, res, next) => {
+    console.error(`Error occurred: ${err.message}`);
+    const status = err.status || 500;
+    res.status(status).render('index', { title: status === 404 ? '404: Not Found' : '500: Server Error' });
 });
 
 const serverPort = process.env.PORT || 3000;
@@ -47,7 +44,7 @@ const serverPort = process.env.PORT || 3000;
 app.listen(serverPort, async () => {
     try {
         await testConnection();
-        console.log(`Server is running on http://localhost:${serverPort}`);
+        console.log(`Server running smoothly on http://localhost:${serverPort}`);
     } catch (error) {
         console.error('Error connecting to the database:', error);
     }
