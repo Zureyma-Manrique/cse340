@@ -19,12 +19,23 @@
                 <%= project.location %>
             </p>
 
-            <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
+            <% if (categories && categories.length> 0) { %>
+                <p><strong>Categories:</strong>
+                    <% categories.forEach((cat, index)=> { %>
+                        <a href="/category/<%= cat.category_id %>"
+                            style="display: inline-block; background: #3498db; color: #fff; padding: 0.2rem 0.6rem; border-radius: 12px; text-decoration: none; font-size: 0.85rem; margin: 0.2rem;">
+                            <%= cat.name %>
+                        </a>
+                        <% }) %>
+                </p>
+                <% } %>
 
-            <h3>Project Description</h3>
-            <p style="margin-top: 0.5rem;">
-                <%= project.description %>
-            </p>
+                    <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
+
+                    <h3>Project Description</h3>
+                    <p style="margin-top: 0.5rem;">
+                        <%= project.description %>
+                    </p>
         </div>
 
         <p style="margin-top: 1.5rem;">

@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <h1>Something Went Wrong</h1>
+        <p>We are experiencing technical difficulties. Please try again later.</p>
+        <p>Return to the <a href="/">homepage</a> to continue browsing.</p>
+
+        <% if (typeof NODE_ENV !=='undefined' && NODE_ENV==='development' ) { %>
+            <details open style="margin-top: 2rem;">
+                <summary>Error Details (Development Only)</summary>
+                <pre style="background:#f4f4f4; padding:1rem; border-radius:4px; overflow:auto;"><%= error %></pre>
+                <pre style="background:#f4f4f4; padding:1rem; border-radius:4px; overflow:auto;"><%= stack %></pre>
+            </details>
+            <% } %>
+    </main>
+    <%- include('../partials/footer') %>

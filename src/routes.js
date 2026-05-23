@@ -1,32 +1,28 @@
 import express from 'express';
+import { showHomePage } from './controllers/index.js';
+import { showOrganizationsPage, showOrganizationDetailsPage } from './controllers/organizations.js';
 import { showProjectsPage, showProjectDetailsPage } from './controllers/projects.js';
-import { getAllOrganizations } from './models/organizations.js';
-import { getAllCategories } from './models/categories.js';
+import { showCategoriesPage, showCategoryDetailsPage } from './controllers/categories.js';
+import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
 
-// Home route
-router.get('/', async (req, res) => {
-    const title = 'Home';
-    res.render('index', { title });
-});
+// Home
+router.get('/', showHomePage);
 
-// Organizations route (Temporarily using inline controller context until assignment refactor)
-router.get('/organizations', async (req, res) => {
-    const organizations = await getAllOrganizations();
-    const title = 'Our Partner Organizations';
-    res.render('organizations', { title, organizations });
-});
+// Organizations
+router.get('/organizations', showOrganizationsPage);
+router.get('/organization/:id', showOrganizationDetailsPage);
 
-// Categories route (Temporarily using inline controller context)
-router.get('/categories', async (req, res) => {
-    const categories = await getAllCategories();
-    const title = 'Service Project Categories';
-    res.render('categories', { title, categories });
-});
-
-// --- Team Activity Service Project Routes ---
+// Projects
 router.get('/projects', showProjectsPage);
-router.get('/project/:id', showProjectDetailsPage); // Route Parameter Path Matcher
+router.get('/project/:id', showProjectDetailsPage);
+
+// Categories
+router.get('/categories', showCategoriesPage);
+router.get('/category/:id', showCategoryDetailsPage);
+
+// Error test route
+router.get('/test-error', testErrorPage);
 
 export default router;

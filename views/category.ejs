@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+    <main class="container">
+        <h1>
+            <%= category.name %>
+        </h1>
+
+        <% if (projects.length===0) { %>
+            <p>No service projects are currently listed under this category.</p>
+            <% } else { %>
+                <div class="category-list">
+                    <ul>
+                        <% projects.forEach(project=> { %>
+                            <li>
+                                <a href="/project/<%= project.project_id %>">
+                                    <%= project.title %>
+                                </a>
+                                &mdash; <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' ,
+                                    month: 'long' , day: 'numeric' }) %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <p style="margin-top: 1.5rem;">
+                        <a href="/categories">&larr; Back to Categories</a>
+                    </p>
+    </main>
+    <%- include('partials/footer') %>

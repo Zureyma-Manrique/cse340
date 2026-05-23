@@ -3,48 +3,71 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { testConnection } from './src/models/db.js';
-import router from './src/routes.js'; // Import your unified router matrix
+import router from './src/routes.js';
 
 dotenv.config();
 
-const app = express();
+const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
+const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const app = express();
+
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static('public'));
-
-// Global request logger middleware (Learning Activity requirement)
+// Middleware: log all incoming requests
 app.use((req, res, next) => {
-    console.log(`${req.method} request received for: ${req.url}`);
+    if (NODE_ENV === 'development') {
+        console.log(`${req.method} ${req.url}`);
+    }
     next();
 });
 
-// Direct Express to route matching pathways via your clean router module
+// Middleware: make NODE_ENV available to all templates
+app.use((req, res, next) => {
+    res.locals.NODE_ENV = NODE_ENV;
+    next();
+});
+
+// Routes
 app.use(router);
 
-// Centralized Catch-All Error Handlers (Learning Activity placeholder structure)
+// Catch-all 404
 app.use((req, res, next) => {
     const err = new Error('Page Not Found');
     err.status = 404;
     next(err);
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
-    console.error(`Error occurred: ${err.message}`);
+    console.error('Error occurred:', err.message);
+    console.error('Stack trace:', err.stack);
+
     const status = err.status || 500;
-    res.status(status).render('index', { title: status === 404 ? '404: Not Found' : '500: Server Error' });
+    const template = status === 404 ? '404' : '500';
+
+    const context = {
+        title: status === 404 ? 'Page Not Found' : 'Server Error',
+        error: err.message,
+        stack: err.stack
+    };
+
+    res.status(status).render(`errors/${template}`, context);
 });
 
-const serverPort = process.env.PORT || 3000;
-
-app.listen(serverPort, async () => {
+app.listen(PORT, async () => {
     try {
         await testConnection();
-        console.log(`Server running smoothly on http://localhost:${serverPort}`);
+        console.log(`Server running at http://localhost:${PORT}`);
+        console.log(`Environment: ${NODE_ENV}`);
     } catch (error) {
         console.error('Error connecting to the database:', error);
     }

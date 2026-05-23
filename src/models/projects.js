@@ -1,6 +1,5 @@
 import db from './db.js';
 
-// Existing function
 const getAllProjects = async () => {
     const query = `
         SELECT p.project_id, p.title, p.description, p.location, p.date,
@@ -13,7 +12,7 @@ const getAllProjects = async () => {
     return result.rows;
 };
 
-// 1. Retrieve the next 'limit' number of upcoming service projects
+// Retrieve the next number_of_projects upcoming service projects
 const getUpcomingProjects = async (number_of_projects) => {
     const query = `
         SELECT p.project_id, p.title, p.description, p.location, p.date, p.organization_id,
@@ -28,7 +27,7 @@ const getUpcomingProjects = async (number_of_projects) => {
     return result.rows;
 };
 
-// 2. Retrieve a single service project by its ID
+// Retrieve a single service project by its ID
 const getProjectDetails = async (id) => {
     const query = `
         SELECT p.project_id, p.title, p.description, p.location, p.date, p.organization_id,
@@ -41,4 +40,35 @@ const getProjectDetails = async (id) => {
     return result.rows.length > 0 ? result.rows[0] : null;
 };
 
-export { getAllProjects, getUpcomingProjects, getProjectDetails };
+// Retrieve all service projects for a given organization
+const getProjectsByOrganizationId = async (organizationId) => {
+    const query = `
+        SELECT project_id, organization_id, title, description, location, date
+        FROM public.project
+        WHERE organization_id = $1
+        ORDER BY date;
+    `;
+    const result = await db.query(query, [organizationId]);
+    return result.rows;
+};
+
+// Retrieve all categories for a given service project
+const getCategoriesForProject = async (projectId) => {
+    const query = `
+        SELECT c.category_id, c.name
+        FROM public.category c
+        JOIN public.project_category pc ON c.category_id = pc.category_id
+        WHERE pc.project_id = $1
+        ORDER BY c.name;
+    `;
+    const result = await db.query(query, [projectId]);
+    return result.rows;
+};
+
+export {
+    getAllProjects,
+    getUpcomingProjects,
+    getProjectDetails,
+    getProjectsByOrganizationId,
+    getCategoriesForProject
+};
