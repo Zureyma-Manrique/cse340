@@ -1,5 +1,10 @@
 <footer>
-        <p>&copy; 2026 BYU-Pathway Worldwide | All rights reserved.</p>
-    </footer>
+    <p>&copy; 2026 BYU-Pathway Worldwide | All rights reserved.
+        <% if (typeof NODE_ENV !=='undefined' && NODE_ENV==='development' ) { %>
+            (Development mode)
+            <% } %>
+    </p>
+</footer>
 </body>
+
 </html>
