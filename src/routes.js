@@ -4,6 +4,12 @@ import { showOrganizationsPage, showOrganizationDetailsPage } from './controller
 import { showProjectsPage, showProjectDetailsPage } from './controllers/projects.js';
 import { showCategoriesPage, showCategoryDetailsPage } from './controllers/categories.js';
 import { testErrorPage } from './controllers/errors.js';
+import { 
+    showCategoriesPage, showCategoryDetailsPage,
+    showNewCategoryForm, processNewCategoryForm,
+    showEditCategoryForm, processEditCategoryForm,
+    categoryValidation
+} from './controllers/categories.js';
 
 const router = express.Router();
 
@@ -24,5 +30,11 @@ router.get('/category/:id', showCategoryDetailsPage);
 
 // Error test route
 router.get('/test-error', testErrorPage);
+
+router.get('/new-category', showNewCategoryForm);
+router.post('/new-category', categoryValidation, processNewCategoryForm);
+
+router.get('/edit-category/:id', showEditCategoryForm);
+router.post('/edit-category/:id', categoryValidation, processEditCategoryForm);
 
 export default router;

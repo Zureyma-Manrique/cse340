@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+    <main class="container">
+        <h1>
+            <%= title %>
+        </h1>
+        <form action="/new-category" method="POST">
+            <div class="form-group">
+                <label for="name">Category Name</label>
+                <input type="text" id="name" name="name" value="<%= categoryName %>" required maxlength="100">
+            </div>
+            <button type="submit" style="margin-top: 1rem;">Create Category</button>
+        </form>
+        <p style="margin-top: 1.5rem;"><a href="/categories">&larr; Back to Categories</a></p>
+    </main>
+    <%- include('partials/footer') %>
