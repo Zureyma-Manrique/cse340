@@ -19,8 +19,10 @@
                         (<%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
                             day: 'numeric' }) %>)
                     </li>
-                    <% }) %>
+                    <% }); %>
             </ul>
         </div>
+
+        <p style="margin-top: 2rem;"><a href="/new-project">+ Add a new service project</a></p>
     </main>
     <%- include('partials/footer') %>

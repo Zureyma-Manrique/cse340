@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+    <main class="container">
+        <h1>
+            <%= title %>
+        </h1>
+        <form action="/new-organization" method="POST" class="form-card">
+            <div class="form-group">
+                <label for="name">Organization Name</label>
+                <input type="text" id="name" name="name" maxlength="150" required />
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" maxlength="500" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="contactEmail">Contact Email</label>
+                <input type="email" id="contactEmail" name="contactEmail" required />
+            </div>
+            <button type="submit">Create Organization</button>
+        </form>
+        <p style="margin-top: 1.5rem;"><a href="/organizations">&larr; Back to Organizations</a></p>
+    </main>
+    <%- include('partials/footer') %>

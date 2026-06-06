@@ -14,6 +14,11 @@
                 <%= organizationDetails.contact_email %>
             </a></p>
 
+        <p style="margin-top: 1rem;">
+            <a href="/edit-organization/<%= organizationDetails.organization_id %>" class="btn-link">Edit
+                Organization</a>
+        </p>
+
         <h3 style="margin-top: 2rem;">Service Projects</h3>
         <% if (projects.length===0) { %>
             <p>No service projects listed for this organization.</p>
@@ -28,13 +33,11 @@
                                 &mdash; <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' ,
                                     month: 'long' , day: 'numeric' }) %>
                             </li>
-                            <% }) %>
+                            <% }); %>
                     </ul>
                 </div>
                 <% } %>
 
-                    <p style="margin-top: 1.5rem;">
-                        <a href="/organizations">&larr; Back to Organizations</a>
-                    </p>
+                    <p style="margin-top: 1.5rem;"><a href="/organizations">&larr; Back to Organizations</a></p>
     </main>
     <%- include('partials/footer') %>

@@ -2,18 +2,36 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import session from 'express-session';
 import { testConnection } from './src/models/db.js';
 import router from './src/routes.js';
+import flash from './src/middleware/flash.js';
 
 dotenv.config();
 
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
 const PORT = process.env.PORT || 3000;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback-secret-change-in-production';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Session management (must come before flash middleware)
+app.use(session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
+}));
+
+// Flash message middleware (must come after session)
+app.use(flash);
+
+// Parse POST request bodies
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware: log all incoming requests
+// Log all incoming requests in development
 app.use((req, res, next) => {
     if (NODE_ENV === 'development') {
         console.log(`${req.method} ${req.url}`);
@@ -30,7 +48,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware: make NODE_ENV available to all templates
+// Make NODE_ENV available to all templates
 app.use((req, res, next) => {
     res.locals.NODE_ENV = NODE_ENV;
     next();

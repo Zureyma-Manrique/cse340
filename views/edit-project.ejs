@@ -1,0 +1,43 @@
+<%- include('partials/header') %>
+    <main class="container">
+        <h1>
+            <%= title %>
+        </h1>
+        <form action="/edit-project/<%= project.project_id %>" method="POST" class="form-card">
+            <div class="form-group">
+                <label for="title">Project Title</label>
+                <input type="text" id="title" name="title" value="<%= project.title %>" maxlength="200" required />
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" maxlength="1000"
+                    required><%= project.description %></textarea>
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" value="<%= project.location %>" maxlength="200"
+                    required />
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <% // Format the date as YYYY-MM-DD for the date input const projectDate=new Date(project.date); const
+                    formattedDate=projectDate.toISOString().split('T')[0]; %>
+                    <input type="date" id="date" name="date" value="<%= formattedDate %>" required />
+            </div>
+            <div class="form-group">
+                <label for="organizationId">Organization</label>
+                <select id="organizationId" name="organizationId" required>
+                    <option value="">-- Select an Organization --</option>
+                    <% organizations.forEach(org=> { %>
+                        <option value="<%= org.organization_id %>" <%=org.organization_id===project.organization_id
+                            ? 'selected' : '' %>>
+                            <%= org.name %>
+                        </option>
+                        <% }); %>
+                </select>
+            </div>
+            <button type="submit">Update Project</button>
+        </form>
+        <p style="margin-top: 1.5rem;"><a href="/project/<%= project.project_id %>">&larr; Back to Project</a></p>
+    </main>
+    <%- include('partials/footer') %>

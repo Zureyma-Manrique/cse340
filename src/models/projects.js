@@ -12,7 +12,6 @@ const getAllProjects = async () => {
     return result.rows;
 };
 
-// Retrieve the next number_of_projects upcoming service projects
 const getUpcomingProjects = async (number_of_projects) => {
     const query = `
         SELECT p.project_id, p.title, p.description, p.location, p.date, p.organization_id,
@@ -27,7 +26,6 @@ const getUpcomingProjects = async (number_of_projects) => {
     return result.rows;
 };
 
-// Retrieve a single service project by its ID
 const getProjectDetails = async (id) => {
     const query = `
         SELECT p.project_id, p.title, p.description, p.location, p.date, p.organization_id,
@@ -40,7 +38,6 @@ const getProjectDetails = async (id) => {
     return result.rows.length > 0 ? result.rows[0] : null;
 };
 
-// Retrieve all service projects for a given organization
 const getProjectsByOrganizationId = async (organizationId) => {
     const query = `
         SELECT project_id, organization_id, title, description, location, date
@@ -52,7 +49,6 @@ const getProjectsByOrganizationId = async (organizationId) => {
     return result.rows;
 };
 
-// Retrieve all categories for a given service project
 const getCategoriesForProject = async (projectId) => {
     const query = `
         SELECT c.category_id, c.name
@@ -65,10 +61,46 @@ const getCategoriesForProject = async (projectId) => {
     return result.rows;
 };
 
+/**
+ * Creates a new service project in the database.
+ * @returns {number} The id of the newly created project record.
+ */
+const createProject = async (title, description, location, date, organizationId) => {
+    const query = `
+        INSERT INTO public.project (title, description, location, date, organization_id)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING project_id
+    `;
+    const result = await db.query(query, [title, description, location, date, organizationId]);
+    if (result.rows.length === 0) {
+        throw new Error('Failed to create project');
+    }
+    return result.rows[0].project_id;
+};
+
+/**
+ * Updates an existing service project in the database.
+ */
+const updateProject = async (id, title, description, location, date, organizationId) => {
+    const query = `
+        UPDATE public.project
+        SET title = $1, description = $2, location = $3, date = $4, organization_id = $5
+        WHERE project_id = $6
+        RETURNING project_id
+    `;
+    const result = await db.query(query, [title, description, location, date, organizationId, id]);
+    if (result.rows.length === 0) {
+        throw new Error('Failed to update project — record not found');
+    }
+    return result.rows[0].project_id;
+};
+
 export {
     getAllProjects,
     getUpcomingProjects,
     getProjectDetails,
     getProjectsByOrganizationId,
-    getCategoriesForProject
+    getCategoriesForProject,
+    createProject,
+    updateProject
 };

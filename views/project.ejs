@@ -21,12 +21,12 @@
 
             <% if (categories && categories.length> 0) { %>
                 <p><strong>Categories:</strong>
-                    <% categories.forEach((cat, index)=> { %>
+                    <% categories.forEach(cat=> { %>
                         <a href="/category/<%= cat.category_id %>"
                             style="display: inline-block; background: #3498db; color: #fff; padding: 0.2rem 0.6rem; border-radius: 12px; text-decoration: none; font-size: 0.85rem; margin: 0.2rem;">
                             <%= cat.name %>
                         </a>
-                        <% }) %>
+                        <% }); %>
                 </p>
                 <% } %>
 
@@ -36,10 +36,14 @@
                     <p style="margin-top: 0.5rem;">
                         <%= project.description %>
                     </p>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <a href="/edit-project/<%= project.project_id %>" class="btn-link">Edit Project</a>
+                        <a href="/project/<%= project.project_id %>/assign-categories" class="btn-link">Assign
+                            Categories</a>
+                    </div>
         </div>
 
-        <p style="margin-top: 1.5rem;">
-            <a href="/projects">&larr; Back to Upcoming Service Projects</a>
-        </p>
+        <p style="margin-top: 1.5rem;"><a href="/projects">&larr; Back to Upcoming Service Projects</a></p>
     </main>
     <%- include('partials/footer') %>
