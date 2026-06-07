@@ -73,9 +73,15 @@ const processLoginForm = async (req, res, next) => {
 };
 
 const processLogout = (req, res, next) => {
-    req.session.destroy((err) => {
+    // 1. Remove the user data from the session
+    req.session.user = null;
+    
+    // 2. Save the session to ensure the user is removed
+    req.session.save((err) => {
         if (err) return next(err);
-        req.flash && req.flash('success', 'You have been logged out.');
+        
+        // 3. Now we can safely set a flash message because the session still exists
+        req.flash('success', 'You have been logged out.');
         res.redirect('/login');
     });
 };
