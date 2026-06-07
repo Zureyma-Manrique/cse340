@@ -23,6 +23,8 @@
             </ul>
         </div>
 
-        <p style="margin-top: 2rem;"><a href="/new-project">+ Add a new service project</a></p>
+        <% if (user && user.role_name==='admin' ) { %>
+            <p style="margin-top: 2rem;"><a href="/new-project">+ Add a new service project</a></p>
+            <% } %>
     </main>
     <%- include('partials/footer') %>

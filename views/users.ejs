@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+<main class="container">
+    <h1><%= title %></h1>
+    <p style="margin-bottom: 1.5rem;">All registered users in the system.</p>
+
+    <table style="width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <thead>
+            <tr style="background: #2c3e50; color: #fff;">
+                <th style="padding: 1rem; text-align: left;">Name</th>
+                <th style="padding: 1rem; text-align: left;">Email</th>
+                <th style="padding: 1rem; text-align: left;">Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach((u, index) => { %>
+            <tr style="border-bottom: 1px solid #eee; background: <%= index % 2 === 0 ? '#fff' : '#f8f9fa' %>;">
+                <td style="padding: 0.85rem 1rem;"><%= u.name %></td>
+                <td style="padding: 0.85rem 1rem;"><%= u.email %></td>
+                <td style="padding: 0.85rem 1rem;">
+                    <span style="display: inline-block; background: <%= u.role_name === 'admin' ? '#2c3e50' : '#3498db' %>; color: #fff; padding: 0.15rem 0.6rem; border-radius: 10px; font-size: 0.8rem;">
+                        <%= u.role_name %>
+                    </span>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <p style="margin-top: 1.5rem;"><a href="/dashboard">&larr; Back to Dashboard</a></p>
+</main>
+<%- include('partials/footer') %>

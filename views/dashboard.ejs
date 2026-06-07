@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<main class="container">
+    <h1><%= title %></h1>
+
+    <div class="org-card" style="max-width: 600px;">
+        <h2 style="margin-bottom: 0.5rem;">Welcome, <%= name %>!</h2>
+        <p style="margin-bottom: 0.5rem;"><strong>Email:</strong> <%= email %></p>
+        <p><strong>Role:</strong>
+            <span style="display: inline-block; background: <%= role_name === 'admin' ? '#2c3e50' : '#3498db' %>; color: #fff; padding: 0.2rem 0.7rem; border-radius: 12px; font-size: 0.85rem;">
+                <%= role_name %>
+            </span>
+        </p>
+    </div>
+
+    <% if (role_name === 'admin') { %>
+    <div style="margin-top: 2rem;">
+        <h2>Admin Tools</h2>
+        <ul style="list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="/users" class="btn-link">👥 View All Registered Users</a></li>
+            <li><a href="/new-organization" class="btn-link" style="margin-top: 0.5rem;">🏢 Add New Organization</a></li>
+            <li><a href="/new-project" class="btn-link" style="margin-top: 0.5rem;">📋 Add New Service Project</a></li>
+            <li><a href="/new-category" class="btn-link" style="margin-top: 0.5rem;">🏷️ Add New Category</a></li>
+        </ul>
+    </div>
+    <% } %>
+
+    <p style="margin-top: 2rem;"><a href="/logout">Sign Out</a></p>
+</main>
+<%- include('partials/footer') %>

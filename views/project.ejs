@@ -37,11 +37,13 @@
                         <%= project.description %>
                     </p>
 
-                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <a href="/edit-project/<%= project.project_id %>" class="btn-link">Edit Project</a>
-                        <a href="/project/<%= project.project_id %>/assign-categories" class="btn-link">Assign
-                            Categories</a>
-                    </div>
+                    <% if (user && user.role_name==='admin' ) { %>
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <a href="/edit-project/<%= project.project_id %>" class="btn-link">Edit Project</a>
+                            <a href="/project/<%= project.project_id %>/assign-categories" class="btn-link">Assign
+                                Categories</a>
+                        </div>
+                        <% } %>
         </div>
 
         <p style="margin-top: 1.5rem;"><a href="/projects">&larr; Back to Upcoming Service Projects</a></p>
