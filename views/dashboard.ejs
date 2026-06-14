@@ -12,6 +12,43 @@
         </p>
     </div>
 
+    <%# ── Volunteer Projects Section ── %>
+    <div style="margin-top: 2rem;">
+        <h2>My Volunteer Projects</h2>
+        <% if (volunteerProjects && volunteerProjects.length > 0) { %>
+            <div class="category-list" style="margin-top: 1rem;">
+                <ul>
+                    <% volunteerProjects.forEach(project => { %>
+                        <li style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <div>
+                                <strong>
+                                    <a href="/project/<%= project.project_id %>">
+                                        <%= project.title %>
+                                    </a>
+                                </strong>
+                                <span style="color: #555; font-size: 0.9rem;">
+                                    &mdash; <%= project.organization_name %> &mdash;
+                                    <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                </span>
+                            </div>
+                            <form action="/project/<%= project.project_id %>/unvolunteer?from=dashboard" method="POST">
+                                <button type="submit"
+                                    style="background: #e74c3c; color: #fff; border: none; padding: 0.35rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; white-space: nowrap;">
+                                    Remove
+                                </button>
+                            </form>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% } else { %>
+            <p style="margin-top: 0.75rem; color: #555;">
+                You have not signed up to volunteer for any projects yet.
+                <a href="/projects">Browse upcoming projects</a> to get involved!
+            </p>
+        <% } %>
+    </div>
+
     <% if (role_name === 'admin') { %>
     <div style="margin-top: 2rem;">
         <h2>Admin Tools</h2>

@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { body, validationResult } from 'express-validator';
 import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
+import { getVolunteerProjectsByUserId } from '../models/volunteers.js';
 
 const SALT_ROUNDS = 10;
 
@@ -75,11 +76,11 @@ const processLoginForm = async (req, res, next) => {
 const processLogout = (req, res, next) => {
     // 1. Remove the user data from the session
     req.session.user = null;
-    
+
     // 2. Save the session to ensure the user is removed
     req.session.save((err) => {
         if (err) return next(err);
-        
+
         // 3. Now we can safely set a flash message because the session still exists
         req.flash('success', 'You have been logged out.');
         res.redirect('/login');
@@ -88,10 +89,14 @@ const processLogout = (req, res, next) => {
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
-const showDashboard = (req, res, next) => {
+const showDashboard = async (req, res, next) => {
     try {
-        const { name, email, role_name } = req.session.user;
-        res.render('dashboard', { title: 'Dashboard', name, email, role_name });
+        const { user_id, name, email, role_name } = req.session.user;
+
+        // Fetch projects the user has volunteered for
+        const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
+
+        res.render('dashboard', { title: 'Dashboard', name, email, role_name, volunteerProjects });
     } catch (error) {
         next(error);
     }
@@ -125,8 +130,6 @@ const requireLogin = (req, res, next) => {
 /**
  * requireRole — middleware factory.
  * Returns a middleware function that checks the user's role_name.
- * Must be a factory (not a plain middleware) because it needs to accept
- * the required role as a parameter at route-definition time.
  *
  * @param {string} role - The role_name required (e.g. 'admin')
  */

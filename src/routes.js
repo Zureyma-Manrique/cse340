@@ -41,6 +41,7 @@ import {
     requireRole,
     registrationValidation
 } from './controllers/users.js';
+import { processAddVolunteer, processRemoveVolunteer } from './controllers/volunteers.js';
 import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
@@ -60,7 +61,7 @@ router.get('/logout', processLogout);
 // ─── Protected Dashboard ──────────────────────────────────────────────────────
 router.get('/dashboard', requireLogin, showDashboard);
 
-// ─── Admin: Users List (Assignment requirement) ───────────────────────────────
+// ─── Admin: Users List ────────────────────────────────────────────────────────
 router.get('/users', requireLogin, requireRole('admin'), showUsersPage);
 
 // ─── Organizations ────────────────────────────────────────────────────────────
@@ -82,6 +83,10 @@ router.get('/new-project', requireLogin, requireRole('admin'), showNewProjectFor
 router.post('/new-project', requireLogin, requireRole('admin'), projectValidation, processNewProjectForm);
 router.get('/edit-project/:id', requireLogin, requireRole('admin'), showEditProjectForm);
 router.post('/edit-project/:id', requireLogin, requireRole('admin'), projectValidation, processEditProjectForm);
+
+// ─── Volunteer routes (login required) ────────────────────────────────────────
+router.post('/project/:projectId/volunteer', requireLogin, processAddVolunteer);
+router.post('/project/:projectId/unvolunteer', requireLogin, processRemoveVolunteer);
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 router.get('/categories', showCategoriesPage);

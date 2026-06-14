@@ -1,5 +1,6 @@
 import { getUpcomingProjects, getProjectDetails, getCategoriesForProject, createProject, updateProject } from '../models/projects.js';
 import { getAllOrganizations } from '../models/organizations.js';
+import { isVolunteering } from '../models/volunteers.js';
 import { body, validationResult } from 'express-validator';
 
 const NUMBER_OF_UPCOMING_PROJECTS = 5;
@@ -15,7 +16,7 @@ const showProjectsPage = async (req, res, next) => {
     }
 };
 
-// Renders the single project details page, including category tags
+// Renders the single project details page, including category tags and volunteer status
 const showProjectDetailsPage = async (req, res, next) => {
     try {
         const projectId = req.params.id;
@@ -28,8 +29,15 @@ const showProjectDetailsPage = async (req, res, next) => {
         }
 
         const categories = await getCategoriesForProject(projectId);
+
+        // Check volunteer status only for logged-in users
+        let userIsVolunteering = false;
+        if (req.session && req.session.user) {
+            userIsVolunteering = await isVolunteering(req.session.user.user_id, projectId);
+        }
+
         const title = project.title;
-        res.render('project', { title, project, categories });
+        res.render('project', { title, project, categories, userIsVolunteering });
     } catch (error) {
         next(error);
     }

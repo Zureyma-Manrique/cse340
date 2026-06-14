@@ -12,38 +12,64 @@
                 </a>
             </p>
             <p><strong>Scheduled Date:</strong>
-                <%= new Date(project.date).toLocaleDateString('en-US', { weekday: 'long' , year: 'numeric' ,
-                    month: 'long' , day: 'numeric' }) %>
+                <%= new Date(project.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric',
+                    month: 'long', day: 'numeric' }) %>
             </p>
             <p><strong>Location/Venue:</strong>
                 <%= project.location %>
             </p>
 
-            <% if (categories && categories.length> 0) { %>
+            <% if (categories && categories.length > 0) { %>
                 <p><strong>Categories:</strong>
-                    <% categories.forEach(cat=> { %>
+                    <% categories.forEach(cat => { %>
                         <a href="/category/<%= cat.category_id %>"
                             style="display: inline-block; background: #3498db; color: #fff; padding: 0.2rem 0.6rem; border-radius: 12px; text-decoration: none; font-size: 0.85rem; margin: 0.2rem;">
                             <%= cat.name %>
                         </a>
-                        <% }); %>
+                    <% }); %>
                 </p>
-                <% } %>
+            <% } %>
 
-                    <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
+            <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
 
-                    <h3>Project Description</h3>
-                    <p style="margin-top: 0.5rem;">
-                        <%= project.description %>
-                    </p>
+            <h3>Project Description</h3>
+            <p style="margin-top: 0.5rem;">
+                <%= project.description %>
+            </p>
 
-                    <% if (user && user.role_name==='admin' ) { %>
-                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <a href="/edit-project/<%= project.project_id %>" class="btn-link">Edit Project</a>
-                            <a href="/project/<%= project.project_id %>/assign-categories" class="btn-link">Assign
-                                Categories</a>
-                        </div>
-                        <% } %>
+            <%# ── Volunteer Section ── %>
+            <% if (isLoggedIn) { %>
+                <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: #f0f8ff; border-left: 4px solid #3498db; border-radius: 4px;">
+                    <% if (userIsVolunteering) { %>
+                        <p style="margin-bottom: 0.75rem; font-weight: 600; color: #2c3e50;">
+                            ✅ You are volunteering for this project.
+                        </p>
+                        <form action="/project/<%= project.project_id %>/unvolunteer?from=project" method="POST" style="display: inline;">
+                            <button type="submit"
+                                style="background: #e74c3c; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                                Remove me as a volunteer
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <p style="margin-bottom: 0.75rem; color: #555;">
+                            Would you like to volunteer for this project?
+                        </p>
+                        <form action="/project/<%= project.project_id %>/volunteer" method="POST" style="display: inline;">
+                            <button type="submit"
+                                style="background: #27ae60; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                                Sign up to volunteer
+                            </button>
+                        </form>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <% if (user && user.role_name === 'admin') { %>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="/edit-project/<%= project.project_id %>" class="btn-link">Edit Project</a>
+                    <a href="/project/<%= project.project_id %>/assign-categories" class="btn-link">Assign Categories</a>
+                </div>
+            <% } %>
         </div>
 
         <p style="margin-top: 1.5rem;"><a href="/projects">&larr; Back to Upcoming Service Projects</a></p>

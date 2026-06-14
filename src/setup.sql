@@ -195,3 +195,11 @@ INSERT INTO public.project_category (project_id, category_id) VALUES
 -- UPDATE users
 --   SET role_id = (SELECT role_id FROM roles WHERE role_name = 'admin')
 --   WHERE email = 'admin@example.com';
+
+CREATE TABLE IF NOT EXISTS public.volunteer (
+    volunteer_id SERIAL PRIMARY KEY,
+    user_id      INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    project_id   INTEGER NOT NULL REFERENCES public.project(project_id) ON DELETE CASCADE,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, project_id)
+);
