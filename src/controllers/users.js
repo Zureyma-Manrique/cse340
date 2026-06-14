@@ -82,8 +82,18 @@ const processLogout = (req, res, next) => {
 const showDashboard = async (req, res, next) => {
     try {
         const { user_id, name, email, role_name } = req.session.user;
+
+        // Fetch projects
         const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
-        res.render('dashboard', { title: 'Dashboard', name, email, role_name, volunteerProjects });
+
+        // Ensure these match EXACTLY what your EJS uses
+        res.render('dashboard', { 
+            title: 'Dashboard', 
+            name: name,             // Make sure this is passed
+            email: email,           // Make sure this is passed
+            role_name: role_name,   // Make sure this is passed
+            volunteerProjects: volunteerProjects 
+        });
     } catch (error) {
         next(error);
     }
