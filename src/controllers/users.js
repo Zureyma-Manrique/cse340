@@ -81,20 +81,27 @@ const processLogout = (req, res, next) => {
 
 const showDashboard = async (req, res, next) => {
     try {
+        // Ensure user is in session before accessing properties
+        if (!req.session || !req.session.user) {
+            return res.redirect('/login');
+        }
+
         const { user_id, name, email, role_name } = req.session.user;
 
-        // Fetch projects
+        // Fetch projects the user has volunteered for
         const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
 
-        // Ensure these match EXACTLY what your EJS uses
+        // Explicitly passing all variables required by dashboard.ejs
         res.render('dashboard', { 
             title: 'Dashboard', 
-            name: name,             // Make sure this is passed
-            email: email,           // Make sure this is passed
-            role_name: role_name,   // Make sure this is passed
-            volunteerProjects: volunteerProjects 
+            name: name,
+            email: email,
+            role_name: role_name,
+            volunteerProjects: volunteerProjects || [] // Fallback to empty array to prevent EJS crashes
         });
     } catch (error) {
+        // Log the error to your terminal to help with future debugging
+        console.error('Error rendering dashboard:', error);
         next(error);
     }
 };
