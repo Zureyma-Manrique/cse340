@@ -31,7 +31,43 @@
             <% } %>
 
             <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
-
+            
+            <%# ── Volunteer Stats & Admin View ── %>
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="font-size: 1.1rem;">
+                        <strong>Total Volunteers Registered:</strong>
+                        <span
+                            style="background: #e8f4f8; color: #2980b9; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: bold;">
+                            <%= volunteerCount %>
+                        </span>
+                    </p>
+            
+                    <%# Admin Only: Show Names and Emails %>
+                        <% if (user && user.role_name==='admin' ) { %>
+                            <div
+                                style="margin-top: 1rem; padding: 1rem; background: #fff8e1; border-left: 4px solid #f1c40f; border-radius: 4px;">
+                                <h4 style="margin-top: 0; color: #d35400;">Admin View: Volunteer Roster</h4>
+                                <% if (volunteerList.length> 0) { %>
+                                    <ul style="margin-bottom: 0; padding-left: 1.5rem; line-height: 1.6;">
+                                        <% volunteerList.forEach(vol=> { %>
+                                            <li>
+                                                <strong>
+                                                    <%= vol.name %>
+                                                </strong>
+                                                (<a href="mailto:<%= vol.email %>" style="color: #2980b9;">
+                                                    <%= vol.email %>
+                                                </a>)
+                                            </li>
+                                            <% }); %>
+                                    </ul>
+                                    <% } else { %>
+                                        <p style="margin-bottom: 0; color: #7f8c8d;">No volunteers have signed up for this project
+                                            yet.</p>
+                                        <% } %>
+                            </div>
+                            <% } %>
+                </div>
+                
             <h3>Project Description</h3>
             <p style="margin-top: 0.5rem;">
                 <%= project.description %>

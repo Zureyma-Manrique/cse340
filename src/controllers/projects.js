@@ -1,6 +1,6 @@
 import { getUpcomingProjects, getProjectDetails, getCategoriesForProject, createProject, updateProject } from '../models/projects.js';
 import { getAllOrganizations } from '../models/organizations.js';
-import { isVolunteering } from '../models/volunteers.js';
+import { isVolunteering, getVolunteerCountForProject, getVolunteersForProject } from '../models/volunteers.js';
 import { body, validationResult } from 'express-validator';
 
 const NUMBER_OF_UPCOMING_PROJECTS = 5;
@@ -29,15 +29,33 @@ const showProjectDetailsPage = async (req, res, next) => {
         }
 
         const categories = await getCategoriesForProject(projectId);
+        
+        // Fetch the count of volunteers (visible to everyone)
+        const volunteerCount = await getVolunteerCountForProject(projectId);
 
-        // Check volunteer status only for logged-in users
+        // Check volunteer status and fetch admin data
         let userIsVolunteering = false;
+        let volunteerList = []; // Default to empty array
+
         if (req.session && req.session.user) {
             userIsVolunteering = await isVolunteering(req.session.user.user_id, projectId);
+
+            // SECURITY: Only query the database for names/emails if the user is an admin
+            if (req.session.user.role_name === 'admin') {
+                volunteerList = await getVolunteersForProject(projectId);
+            }
         }
 
         const title = project.title;
-        res.render('project', { title, project, categories, userIsVolunteering });
+        // Pass the new variables to the EJS template
+        res.render('project', { 
+            title, 
+            project, 
+            categories, 
+            userIsVolunteering, 
+            volunteerCount, 
+            volunteerList 
+        });
     } catch (error) {
         next(error);
     }

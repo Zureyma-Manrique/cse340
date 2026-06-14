@@ -59,4 +59,40 @@ const isVolunteering = async (userId, projectId) => {
     return result.rows.length > 0;
 };
 
-export { addVolunteer, removeVolunteer, getVolunteerProjectsByUserId, isVolunteering };
+/**
+ * Gets the total count of volunteers registered for a specific project.
+ */
+const getVolunteerCountForProject = async (projectId) => {
+    const query = `
+        SELECT COUNT(*) AS count 
+        FROM public.volunteer 
+        WHERE project_id = $1
+    `;
+    const result = await db.query(query, [projectId]);
+    return parseInt(result.rows[0].count, 10); // Ensure it returns a number
+};
+
+/**
+ * Gets the detailed list of volunteers (names and emails) for a project.
+ * Designed for admin use.
+ */
+const getVolunteersForProject = async (projectId) => {
+    const query = `
+        SELECT u.user_id, u.name, u.email, v.created_at
+        FROM public.volunteer v
+        JOIN users u ON v.user_id = u.user_id
+        WHERE v.project_id = $1
+        ORDER BY v.created_at ASC
+    `;
+    const result = await db.query(query, [projectId]);
+    return result.rows;
+};
+
+export { 
+    addVolunteer, 
+    removeVolunteer, 
+    getVolunteerProjectsByUserId, 
+    isVolunteering,
+    getVolunteerCountForProject,
+    getVolunteersForProject
+};
