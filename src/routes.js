@@ -36,10 +36,13 @@ import {
     processLoginForm,
     processLogout,
     showDashboard,
+    showChangePasswordForm,
+    processChangePasswordForm,
     showUsersPage,
     requireLogin,
     requireRole,
-    registrationValidation
+    registrationValidation,
+    changePasswordValidation
 } from './controllers/users.js';
 import { processAddVolunteer, processRemoveVolunteer } from './controllers/volunteers.js';
 import { testErrorPage } from './controllers/errors.js';
@@ -61,6 +64,10 @@ router.get('/logout', processLogout);
 // ─── Protected Dashboard ──────────────────────────────────────────────────────
 router.get('/dashboard', requireLogin, showDashboard);
 
+// ─── Change Password ──────────────────────────────────────────────────────────
+router.get('/change-password', requireLogin, showChangePasswordForm);
+router.post('/change-password', requireLogin, changePasswordValidation, processChangePasswordForm);
+
 // ─── Admin: Users List ────────────────────────────────────────────────────────
 router.get('/users', requireLogin, requireRole('admin'), showUsersPage);
 
@@ -68,7 +75,6 @@ router.get('/users', requireLogin, requireRole('admin'), showUsersPage);
 router.get('/organizations', showOrganizationsPage);
 router.get('/organization/:id', showOrganizationDetailsPage);
 
-// Admin-only: create / edit organizations
 router.get('/new-organization', requireLogin, requireRole('admin'), showNewOrganizationForm);
 router.post('/new-organization', requireLogin, requireRole('admin'), organizationValidation, processNewOrganizationForm);
 router.get('/edit-organization/:id', requireLogin, requireRole('admin'), showEditOrganizationForm);
@@ -78,7 +84,6 @@ router.post('/edit-organization/:id', requireLogin, requireRole('admin'), organi
 router.get('/projects', showProjectsPage);
 router.get('/project/:id', showProjectDetailsPage);
 
-// Admin-only: create / edit projects
 router.get('/new-project', requireLogin, requireRole('admin'), showNewProjectForm);
 router.post('/new-project', requireLogin, requireRole('admin'), projectValidation, processNewProjectForm);
 router.get('/edit-project/:id', requireLogin, requireRole('admin'), showEditProjectForm);
@@ -92,20 +97,15 @@ router.post('/project/:projectId/unvolunteer', requireLogin, processRemoveVolunt
 router.get('/categories', showCategoriesPage);
 router.get('/category/:id', showCategoryDetailsPage);
 
-// Admin-only: create / edit / assign categories
 router.get('/new-category', requireLogin, requireRole('admin'), showNewCategoryForm);
 router.post('/new-category', requireLogin, requireRole('admin'), categoryValidation, processNewCategoryForm);
 router.get('/edit-category/:id', requireLogin, requireRole('admin'), showEditCategoryForm);
 router.post('/edit-category/:id', requireLogin, requireRole('admin'), categoryValidation, processEditCategoryForm);
 
-// Admin-only: assign categories to project
 router.get('/project/:projectId/assign-categories', requireLogin, requireRole('admin'), showAssignCategoriesForm);
 router.post('/project/:projectId/assign-categories', requireLogin, requireRole('admin'), processAssignCategoriesForm);
 
 // ─── Error test ───────────────────────────────────────────────────────────────
 router.get('/test-error', testErrorPage);
-
-// User dashboard
-router.get('/dashboard', requireLogin, showDashboard);
 
 export default router;

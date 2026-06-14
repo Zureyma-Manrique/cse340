@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { body, validationResult } from 'express-validator';
-import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
+import { createUser, authenticateUser, getAllUsers, findUserById, updatePassword } from '../models/users.js';
 import { getVolunteerProjectsByUserId } from '../models/volunteers.js';
 
 const SALT_ROUNDS = 10;
@@ -24,16 +24,12 @@ const processUserRegistrationForm = async (req, res, next) => {
         }
 
         const { name, email, password } = req.body;
-
-        // Hash the password before storing
         const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-
         await createUser(name, email, passwordHash);
 
         req.flash('success', 'Account created successfully! Please log in.');
         res.redirect('/login');
     } catch (error) {
-        // Handle duplicate email
         if (error.code === '23505') {
             req.flash('error', 'An account with that email already exists.');
             return res.redirect('/register');
@@ -62,7 +58,6 @@ const processLoginForm = async (req, res, next) => {
             return res.redirect('/login');
         }
 
-        // Store user (without password_hash) on session
         req.session.user = user;
         console.log('User logged in:', user.email, '| Role:', user.role_name);
 
@@ -74,14 +69,9 @@ const processLoginForm = async (req, res, next) => {
 };
 
 const processLogout = (req, res, next) => {
-    // 1. Remove the user data from the session
     req.session.user = null;
-
-    // 2. Save the session to ensure the user is removed
     req.session.save((err) => {
         if (err) return next(err);
-
-        // 3. Now we can safely set a flash message because the session still exists
         req.flash('success', 'You have been logged out.');
         res.redirect('/login');
     });
@@ -91,16 +81,57 @@ const processLogout = (req, res, next) => {
 
 const showDashboard = async (req, res, next) => {
     try {
-        // Defensive check
-        if (!req.session || !req.session.user) {
-            return res.redirect('/login');
+        const { user_id, name, email, role_name } = req.session.user;
+        const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
+        res.render('dashboard', { title: 'Dashboard', name, email, role_name, volunteerProjects });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ─── Change Password ──────────────────────────────────────────────────────────
+
+const showChangePasswordForm = (req, res, next) => {
+    try {
+        res.render('change-password', { title: 'Change Password' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const processChangePasswordForm = async (req, res, next) => {
+    try {
+        const results = validationResult(req);
+        if (!results.isEmpty()) {
+            results.array().forEach((error) => req.flash('error', error.msg));
+            return res.redirect('/change-password');
         }
 
-        const { user_id, name, email, role_name } = req.session.user;
+        const { currentPassword, newPassword, confirmPassword } = req.body;
 
-        const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
+        if (newPassword !== confirmPassword) {
+            req.flash('error', 'New passwords do not match.');
+            return res.redirect('/change-password');
+        }
 
-        res.render('dashboard', { title: 'Dashboard', name, email, role_name, volunteerProjects });
+        const userId = req.session.user.user_id;
+        const user = await findUserById(userId);
+        if (!user) {
+            req.flash('error', 'User account not found.');
+            return res.redirect('/change-password');
+        }
+
+        const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!isValid) {
+            req.flash('error', 'Current password is incorrect.');
+            return res.redirect('/change-password');
+        }
+
+        const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+        await updatePassword(userId, newPasswordHash);
+
+        req.flash('success', 'Password updated successfully!');
+        res.redirect('/dashboard');
     } catch (error) {
         next(error);
     }
@@ -119,10 +150,6 @@ const showUsersPage = async (req, res, next) => {
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
-/**
- * requireLogin — standard middleware.
- * Redirects to /login if no session user exists.
- */
 const requireLogin = (req, res, next) => {
     if (!req.session || !req.session.user) {
         req.flash('error', 'You must be logged in to access that page.');
@@ -131,12 +158,6 @@ const requireLogin = (req, res, next) => {
     next();
 };
 
-/**
- * requireRole — middleware factory.
- * Returns a middleware function that checks the user's role_name.
- *
- * @param {string} role - The role_name required (e.g. 'admin')
- */
 const requireRole = (role) => {
     return (req, res, next) => {
         if (!req.session || !req.session.user) {
@@ -167,6 +188,16 @@ const registrationValidation = [
         .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ];
 
+const changePasswordValidation = [
+    body('currentPassword')
+        .notEmpty().withMessage('Current password is required'),
+    body('newPassword')
+        .notEmpty().withMessage('New password is required')
+        .isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+    body('confirmPassword')
+        .notEmpty().withMessage('Please confirm your new password')
+];
+
 export {
     showUserRegistrationForm,
     processUserRegistrationForm,
@@ -174,8 +205,11 @@ export {
     processLoginForm,
     processLogout,
     showDashboard,
+    showChangePasswordForm,
+    processChangePasswordForm,
     showUsersPage,
     requireLogin,
     requireRole,
-    registrationValidation
+    registrationValidation,
+    changePasswordValidation
 };
