@@ -91,9 +91,13 @@ const processLogout = (req, res, next) => {
 
 const showDashboard = async (req, res, next) => {
     try {
+        // Defensive check
+        if (!req.session || !req.session.user) {
+            return res.redirect('/login');
+        }
+
         const { user_id, name, email, role_name } = req.session.user;
 
-        // Fetch projects the user has volunteered for
         const volunteerProjects = await getVolunteerProjectsByUserId(user_id);
 
         res.render('dashboard', { title: 'Dashboard', name, email, role_name, volunteerProjects });

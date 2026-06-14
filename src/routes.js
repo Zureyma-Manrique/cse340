@@ -105,4 +105,7 @@ router.post('/project/:projectId/assign-categories', requireLogin, requireRole('
 // ─── Error test ───────────────────────────────────────────────────────────────
 router.get('/test-error', testErrorPage);
 
+// User dashboard
+router.get('/dashboard', requireLogin, showDashboard);
+
 export default router;
